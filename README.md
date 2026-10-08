@@ -221,5 +221,37 @@ Results on Apple Silicon (MPS):
 
 ---
 
+## 🌟 Modern LLM Enhancements
+
+NexLM includes state-of-the-art architecture components used in modern production LLMs (Llama 3, Mistral, Gemma):
+
+1. **Rotary Position Embeddings (RoPE)** (`model/rope.py`):
+   - Relative position encoding via complex coordinate rotation.
+   - Translation-invariant inner products: $\langle R_m q, R_n k \rangle = q^T R_{n-m} k$.
+
+2. **SwiGLU Gated Feed-Forward Network** (`model/swiglu.py`):
+   - Bilinear gating formulation: $\text{SwiGLU}(x) = (\text{SiLU}(x W_{\text{gate}}) \odot (x W_{\text{up}})) W_{\text{down}}$.
+   - Superior empirical perplexity compared to standard GELU / ReLU.
+
+3. **Grouped-Query Attention (GQA)** (`model/gqa.py`):
+   - $4\times$ to $8\times$ reduction in KV cache memory footprint by sharing key/value heads across query groups.
+   - Enables ultra-long context decoding without GPU out-of-memory errors.
+
+4. **Automatic Mixed Precision (AMP)** (`training/amp.py`):
+   - Native `fp16` and `bf16` training acceleration with dynamic gradient scaling.
+
+5. **Post-Training Quantization (INT8 & INT4)** (`inference/quantize.py`):
+   - Per-channel symmetric absolute maximum weight quantization.
+   - Cuts model memory footprint in half (INT8) or quarter (INT4) with $> 0.999$ output cosine similarity.
+
+6. **Streaming Server & Web Playground** (`server/server.py`):
+   - OpenAI-compatible REST API with Server-Sent Events (`/v1/chat/completions`).
+   - Dark-mode web interface served at `http://localhost:8080/`.
+
+7. **Needle-In-A-Haystack (NIAH) Benchmark** (`benchmarks/needle_in_haystack.py`):
+   - Evaluates long-context retrieval accuracy by hiding target secrets at varying document depths.
+
+---
+
 ## 📜 License
 MIT License. Created by [Sujan](https://github.com/sujanv).

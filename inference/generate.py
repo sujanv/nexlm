@@ -119,6 +119,61 @@ def generate(
     return tokens
 
 
+@torch.no_grad()
+def generate_stream(
+    model: GPT,
+    input_ids: torch.Tensor,
+    max_new_tokens: int = 50,
+    temperature: float = 0.8,
+    top_k: Optional[int] = 40,
+    top_p: Optional[float] = 0.9,
+    eos_token_id: Optional[int] = None,
+    use_kv_cache: bool = True,
+):
+    """Yields generated token IDs one by one for real-time streaming."""
+    model.eval()
+    tokens = input_ids.clone()
+
+    if use_kv_cache:
+        logits, _, kv_caches = model(tokens, kv_cache=None, use_cache=True, start_pos=0)
+        next_token = sample_next_token(logits[:, -1, :], temperature=temperature, top_k=top_k, top_p=top_p)
+        token_id = next_token.item()
+        yield token_id
+
+        if eos_token_id is not None and token_id == eos_token_id:
+            return
+
+        for _ in range(max_new_tokens - 1):
+            current_pos = tokens.size(1)
+            tokens = torch.cat([tokens, next_token], dim=1)
+            if current_pos >= model.config.max_seq_len:
+                break
+
+            logits, _, kv_caches = model(
+                next_token,
+                kv_cache=kv_caches,
+                use_cache=True,
+                start_pos=current_pos,
+            )
+            next_token = sample_next_token(logits[:, -1, :], temperature=temperature, top_k=top_k, top_p=top_p)
+            token_id = next_token.item()
+            yield token_id
+
+            if eos_token_id is not None and token_id == eos_token_id:
+                break
+    else:
+        for _ in range(max_new_tokens):
+            idx_cond = tokens[:, -model.config.max_seq_len:]
+            logits, _, _ = model(idx_cond, use_cache=False)
+            next_token = sample_next_token(logits[:, -1, :], temperature=temperature, top_k=top_k, top_p=top_p)
+            token_id = next_token.item()
+            tokens = torch.cat([tokens, next_token], dim=1)
+            yield token_id
+
+            if eos_token_id is not None and token_id == eos_token_id:
+                break
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate text using trained NexLM checkpoint")
     parser.add_argument("--checkpoint", type=str, default="checkpoints/best.pt", help="Path to checkpoint")

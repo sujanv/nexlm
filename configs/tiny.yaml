@@ -1,0 +1,10 @@
+vocab_size: 5000
+max_seq_len: 256
+d_model: 256
+n_heads: 4
+n_layers: 4
+dropout: 0.1
+tie_weights: true
+learning_rate: 0.0005
+batch_size: 16
+max_steps: 1000

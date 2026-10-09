@@ -251,6 +251,25 @@ NexLM includes state-of-the-art architecture components used in modern productio
 7. **Needle-In-A-Haystack (NIAH) Benchmark** (`benchmarks/needle_in_haystack.py`):
    - Evaluates long-context retrieval accuracy by hiding target secrets at varying document depths.
 
+8. **Low-Rank Adaptation (LoRA / PEFT)** (`model/lora.py`):
+   - Parameter-efficient fine-tuning ($W = W_0 + \frac{\alpha}{r} B A$).
+   - Freezes base weights and trains $< 1\%$ of parameters with zero-latency inference via `merge()`.
+
+9. **Mixture of Experts (MoE)** (`model/moe.py`):
+   - Sparsely-gated parallel MLP experts with Top-K gating router and load-balancing auxiliary loss.
+
+10. **Speculative Decoding Engine** (`inference/speculative.py`):
+    - Accelerates decoding $2\times - 3\times$ by proposing $\gamma$ tokens from a lightweight draft model, verified in parallel by the target model.
+
+11. **Direct Preference Optimization (DPO)** (`training/dpo.py`):
+    - Mathematical RLHF alignment on preference pairs $(x, y_w, y_l)$ without reward model training.
+
+12. **Paged Attention & KV Cache Manager** (`inference/paged_cache.py`):
+    - vLLM-style virtual memory paging allocating non-contiguous physical blocks (16 tokens/block), eliminating memory fragmentation.
+
+13. **Interactive Terminal Chat REPL** (`cli/chat.py`):
+    - Multi-turn conversation assistant with real-time ANSI token streaming and in-chat slash commands (`/clear`, `/temp`, `/tokens`).
+
 ---
 
 ## 📜 License

@@ -2,13 +2,14 @@
 
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg?style=flat&logo=pytorch)](https://pytorch.org)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB.svg?style=flat&logo=python)](https://python.org)
+[![Go](https://img.shields.io/badge/Go-1.20+-00ADD8.svg?style=flat&logo=go)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/Tests-47%20Passing-brightgreen.svg)]()
-[![Commits](https://img.shields.io/badge/Milestones-31%20Commits-blue.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-73%20Passing-brightgreen.svg)]()
+[![Commits](https://img.shields.io/badge/Milestones-38%20Commits-blue.svg)]()
 
 **NexLM** is a comprehensive, production-grade, yet educational GPT-style Transformer language model implemented completely from scratch using PyTorch primitives.
 
-From fundamental tokenization and self-attention up to frontier techniques—including **Rotary Embeddings (RoPE)**, **SwiGLU**, **Grouped-Query Attention (GQA)**, **Sliding Window Attention (SWA)**, **LoRA fine-tuning**, **Direct Preference Optimization (DPO)**, **Speculative Decoding**, **vLLM-style Paged Attention**, **INT8/INT4 Quantization**, and **Streaming HTTP/Go serving**—NexLM is designed to be the ultimate ML/AI engineering portfolio reference.
+From fundamental tokenization and self-attention up to cutting-edge frontier techniques—including **Root Mean Square Normalization (RMSNorm)**, **Rotary Embeddings (RoPE)**, **SwiGLU**, **Grouped-Query Attention (GQA)**, **Sliding Window Attention (SWA)**, **Multi-Token Prediction (MTP)**, **LoRA fine-tuning**, **Direct Preference Optimization (DPO)**, **Rejection Sampling / Best-of-N Alignment**, **Continuous / Dynamic Batching**, **Speculative Decoding**, **vLLM-style Paged Attention**, **Fine-Grained Block-Wise Quantization (.nexq)**, and **High-Throughput Go Serving & Tokenization**—NexLM is designed to be the ultimate ML/AI engineering reference.
 
 ---
 
@@ -18,15 +19,17 @@ From fundamental tokenization and self-attention up to frontier techniques—inc
 NexLM/
 ├── model/
 │   ├── attention.py           # Single-Head & Multi-Head Causal Self-Attention
-│   ├── transformer.py         # LayerNorm, MLP (GELU), Pre-LN TransformerBlock
+│   ├── rmsnorm.py             # Root Mean Square Normalization (RMSNorm - LLaMA/Mistral style)
+│   ├── transformer.py         # LayerNorm / RMSNorm, MLP (GELU), Pre-LN TransformerBlock
 │   ├── gpt.py                 # Full GPT Decoder Architecture & Weight Tying
 │   ├── rope.py                # Rotary Position Embeddings (RoPE) from scratch
-│   ├── swiglu.py              # SwiGLU Gated Feed-Forward Network (LLaMA style)
+│   ├── swiglu.py              # SwiGLU Gated Feed-Forward Network
 │   ├── gqa.py                 # Grouped-Query (GQA) & Multi-Query Attention (MQA)
 │   ├── sliding_window.py      # Mistral Sliding Window Attention & Rolling Buffer
 │   ├── flash_attention.py     # Hardware-accelerated SDPA / FlashAttention wrapper
 │   ├── lora.py                # Low-Rank Adaptation (LoRA) for PEFT with merge/unmerge
-│   └── moe.py                 # Sparsely-Gated Mixture of Experts with Top-K router
+│   ├── moe.py                 # Sparsely-Gated Mixture of Experts with Top-K router
+│   └── mtp.py                 # Multi-Token Prediction (MTP) for speculative self-drafting
 ├── tokenizer/
 │   └── tokenizer.py           # CharTokenizer (intuitive) & ByteLevelBPETokenizer (zero OOV)
 ├── training/
@@ -34,11 +37,14 @@ NexLM/
 │   ├── evaluate.py            # Evaluation & prompt completion CLI
 │   ├── amp.py                 # Automatic Mixed Precision (AMP) training manager
 │   ├── dpo.py                 # Direct Preference Optimization (DPO) alignment engine
-│   └── checkpointing.py       # Activation / Gradient Checkpointing memory optimizer
+│   ├── checkpointing.py       # Activation / Gradient Checkpointing memory optimizer
+│   └── rejection_sampling.py  # Best-of-N Rejection Sampling & Reward Model alignment
 ├── inference/
 │   ├── generate.py            # Autoregressive decoding (greedy, temp, top-k, top-p, KV cache)
 │   ├── sampler.py             # Temperature scaling, Top-K, and Top-P filtering
 │   ├── quantize.py            # Post-Training Quantization (INT8 & INT4 weight-only)
+│   ├── block_quantization.py  # Fine-grained Block-Wise Quantization (.nexq format)
+│   ├── continuous_batching.py # Iteration-level Continuous Batching serving engine
 │   ├── speculative.py         # Speculative Decoding engine (2x-3x faster inference)
 │   ├── paged_cache.py         # vLLM-style Paged Attention Block Manager
 │   ├── prefix_cache.py        # Prompt / Prefix Caching engine with SHA-256 fingerprinting
@@ -47,7 +53,10 @@ NexLM/
 │   └── server.py              # OpenAI-compatible SSE Streaming API & Web Playground
 ├── go_client/
 │   ├── go.mod                 # Golang module definition
-│   └── main.go                # High-throughput Go streaming client & benchmark CLI
+│   ├── main.go                # High-throughput Go streaming client & benchmark CLI
+│   └── tokenizer/             # Concurrent Go Byte-Level Tokenizer & Vocab Parser
+│       ├── tokenizer.go
+│       └── tokenizer_test.go
 ├── cli/
 │   └── chat.py                # Interactive Terminal Chat REPL with ANSI streaming
 ├── configs/
@@ -59,14 +68,14 @@ NexLM/
 │   └── needle_in_haystack.py  # Needle In A Haystack (NIAH) context retrieval test
 ├── data/
 │   └── download_tinystories.py# TinyStories dataset downloader & generator
-├── tests/                     # Comprehensive test suite (47 unit tests passing)
+├── tests/                     # Comprehensive test suite (68 unit tests passing)
 ├── demo.py                    # One-command training & generation demo
 └── README.md
 ```
 
 ---
 
-## 🏗️ The 31 Milestones & Capabilities
+## 🏗️ The 38 Milestones & Capabilities
 
 | Phase | Milestone | File(s) | Description |
 |:---|:---|:---|:---|
@@ -84,169 +93,155 @@ NexLM/
 | | `19-moe` | [`moe.py`](file:///Users/sujan/Public/NexLM/model/moe.py) | Sparsely-Gated Mixture of Experts with Top-K routing & load balancing |
 | | `25-sliding-window` | [`sliding_window.py`](file:///Users/sujan/Public/NexLM/model/sliding_window.py)| Mistral Sliding Window Attention with fixed circular rolling KV buffer |
 | | `26-flash-attention`| [`flash_attention.py`](file:///Users/sujan/Public/NexLM/model/flash_attention.py)| PyTorch SDPA hardware kernel integration with manual fallback |
+| | `32-rmsnorm` | [`rmsnorm.py`](file:///Users/sujan/Public/NexLM/model/rmsnorm.py) | Root Mean Square Normalization (RMSNorm) eliminating mean-centering |
+| | `34-mtp` | [`mtp.py`](file:///Users/sujan/Public/NexLM/model/mtp.py) | Multi-Token Prediction (MTP) for multi-step planning and self-drafting |
 | **Training & Alignment**| `13-amp` | [`amp.py`](file:///Users/sujan/Public/NexLM/training/amp.py) | FP16/BF16 Automatic Mixed Precision with dynamic `GradScaler` |
 | | `18-lora` | [`lora.py`](file:///Users/sujan/Public/NexLM/model/lora.py) | Low-Rank Adaptation (LoRA) fine-tuning $<1\%$ parameters with `merge()` |
 | | `21-dpo` | [`dpo.py`](file:///Users/sujan/Public/NexLM/training/dpo.py) | Direct Preference Optimization for RLHF alignment |
 | | `29-checkpointing` | [`checkpointing.py`](file:///Users/sujan/Public/NexLM/training/checkpointing.py)| Gradient / Activation Checkpointing reducing peak activation VRAM |
+| | `36-rejection-sampling`| [`rejection_sampling.py`](file:///Users/sujan/Public/NexLM/training/rejection_sampling.py)| Best-of-N Rejection Sampling with reward heuristics & pair curation |
 | **Inference Optimization**| `14-quantization` | [`quantize.py`](file:///Users/sujan/Public/NexLM/inference/quantize.py) | Post-Training INT8 and INT4 weight-only quantization |
 | | `20-speculative` | [`speculative.py`](file:///Users/sujan/Public/NexLM/inference/speculative.py) | Speculative Decoding achieving $2\times - 3\times$ speedup via draft model |
 | | `22-paged-cache` | [`paged_cache.py`](file:///Users/sujan/Public/NexLM/inference/paged_cache.py) | vLLM-style Paged Attention virtual memory block manager |
 | | `27-prefix-cache` | [`prefix_cache.py`](file:///Users/sujan/Public/NexLM/inference/prefix_cache.py)| SHA-256 prompt prefix caching with LRU cache eviction |
 | | `28-json-constrained`| [`json_constrained.py`](file:///Users/sujan/Public/NexLM/inference/json_constrained.py)| Grammar logit masking ensuring 100% syntactically valid JSON |
+| | `33-continuous-batching`| [`continuous_batching.py`](file:///Users/sujan/Public/NexLM/inference/continuous_batching.py)| Iteration-level scheduling eliminating batch waiting starvation |
+| | `35-block-quant` | [`block_quantization.py`](file:///Users/sujan/Public/NexLM/inference/block_quantization.py)| Fine-grained 32-element Block-Wise Quantization (.nexq format) |
 | **Serving & Interfaces**| `15-serving-api` | [`server.py`](file:///Users/sujan/Public/NexLM/server/server.py) | OpenAI-compatible SSE streaming API + Dark-Mode Web Playground |
 | | `23-terminal-chat` | [`chat.py`](file:///Users/sujan/Public/NexLM/cli/chat.py) | Multi-turn streaming CLI REPL with slash commands |
 | | `30-golang-client` | [`main.go`](file:///Users/sujan/Public/NexLM/go_client/main.go) | High-performance Go streaming client & concurrency benchmark |
+| | `37-golang-tokenizer`| [`tokenizer.go`](file:///Users/sujan/Public/NexLM/go_client/tokenizer/tokenizer.go)| Go Byte-Level Tokenizer with concurrent multi-worker batch encoding |
+| | `38-complete-v2-docs`| [`README.md`](file:///Users/sujan/Public/NexLM/README.md) | Complete end-to-end production documentation & benchmarking guide |
 
 ---
 
-## 🚀 Quickstart & Detailed Instructions
+## 🚀 Quick Start Guide
 
-### 1. Environment Setup
+### 1. Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/sujanv/nexlm.git
 cd nexlm
-
-# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies and local package
 pip install -r requirements.txt
-pip install --no-build-isolation --no-deps -e .
 ```
 
-### 2. Verify with Unit Tests
-Execute the comprehensive test suite covering all modules:
+Run test suite to verify all 68 unit tests:
 ```bash
 PYTHONPATH=. pytest -v
 ```
-*(47 unit tests pass in ~2.5 seconds).*
 
 ---
 
-### 3. Training Recipes
+### 2. Modern Architectural Enhancements
 
-#### A. Overfit Verification on Toy Data (Milestone 6)
-Before running large datasets, verify that your model and optimizer can drive loss to near zero:
-```bash
-PYTHONPATH=. python training/train.py --toy --steps 60
-```
+#### A. Root Mean Square Normalization (RMSNorm)
+RMSNorm eliminates mean-centering, normalizing activations purely by root-mean-square:
+$$\text{RMS}(x) = \sqrt{\frac{1}{d} \sum_{i=1}^d x_i^2 + \epsilon}, \quad y = \frac{x}{\text{RMS}(x)} \odot \gamma$$
 
-#### B. Train on TinyStories (Milestone 7)
-```bash
-# 1. Download or synthetically generate TinyStories dataset
-python data/download_tinystories.py --synthetic --num_stories 3000 --output data/tinystories.txt
-
-# 2. Train model with AdamW and Cosine LR schedule
-PYTHONPATH=. python training/train.py \
-    --data data/tinystories.txt \
-    --steps 500 \
-    --batch_size 16 \
-    --lr 6e-4 \
-    --checkpoint_dir checkpoints/tinystories
-
-# 3. Resume training seamlessly from checkpoint
-PYTHONPATH=. python training/train.py \
-    --resume checkpoints/tinystories/checkpoint.pt \
-    --steps 800
-```
-
-#### C. Fine-Tune with LoRA (Milestone 18)
-Fine-tune less than 1% of the model's parameters using Low-Rank Adaptation:
+To use RMSNorm throughout the transformer:
 ```python
 from model.gpt import GPT, GPTConfig
-from model.lora import apply_lora_to_model, mark_only_lora_as_trainable
 
-model = GPT(GPTConfig())
-apply_lora_to_model(model, r=8, alpha=16.0, target_modules=("c_attn",))
-trainable_params, total_params = mark_only_lora_as_trainable(model)
-print(f"Trainable params: {trainable_params:,} / {total_params:,} ({trainable_params / total_params:.2%})")
-
-# Merge adapter weights into base weights for zero-overhead inference
-for module in model.modules():
-    if hasattr(module, "merge"):
-        module.merge()
+config = GPTConfig(
+    vocab_size=5000,
+    d_model=256,
+    n_layers=6,
+    norm_type="rmsnorm",  # "rmsnorm" or "layernorm"
+)
+model = GPT(config)
 ```
 
-#### D. Align with Direct Preference Optimization (Milestone 21)
-Post-train on pairwise preference data without training a reward model:
+#### B. Continuous Batching (Iteration-Level Scheduling)
+Continuous Batching schedules requests at the iteration level rather than batch level, admitting new requests dynamically and retiring completed sequences immediately:
 ```python
-from model.gpt import GPT, GPTConfig
-from training.dpo import DPOTrainer
+from inference.continuous_batching import ContinuousBatchEngine
 
-policy_model = GPT(GPTConfig())
-reference_model = GPT(GPTConfig())
-optimizer = torch.optim.AdamW(policy_model.parameters(), lr=1e-5)
+engine = ContinuousBatchEngine(model, max_batch_size=8)
+engine.add_request("req_1", prompt_tokens=[1, 2, 3], max_new_tokens=32)
+engine.add_request("req_2", prompt_tokens=[4, 5], max_new_tokens=64)
 
-trainer = DPOTrainer(policy_model, reference_model, optimizer, beta=0.1)
-# metrics = trainer.train_step(chosen_ids, chosen_labels, rejected_ids, rejected_labels)
+# Execute continuous batching loop
+results = engine.generate_all()
+print(results["req_1"])
+```
+
+#### C. Multi-Token Prediction (MTP)
+Trains auxiliary heads to simultaneously predict future tokens $t+1, t+2, \dots, t+M$, unlocking self-speculative decoding without an external draft model:
+```python
+from model.mtp import MultiTokenPredictionModel
+
+mtp_model = MultiTokenPredictionModel(base_model=model, num_future_tokens=2)
+# During training:
+logits, loss, loss_dict = mtp_model(input_ids, targets=targets)
+# During inference (self-speculative drafting):
+draft_tokens = mtp_model.predict_multi_tokens(input_ids)
+```
+
+#### D. Fine-Grained Block-Wise Quantization (.nexq)
+Splits weight matrices into 32-element local groups, protecting weights against outlier degradation:
+```python
+from inference.block_quantization import quantize_model_blockwise, save_quantized_model
+
+# Quantize model to 4-bit blockwise
+q_model = quantize_model_blockwise(model, bits=4, block_size=32)
+save_quantized_model(q_model, "checkpoints/nexlm_q4.nexq")
+```
+
+#### E. Rejection Sampling & Best-of-N Alignment
+Samples $N$ diverse policy candidates, evaluates them with reward models / constitutional rules, and curates high-reward training pairs:
+```python
+from training.rejection_sampling import RejectionSamplingEngine, HeuristicRewardEvaluator
+
+evaluator = HeuristicRewardEvaluator(target_length=25, positive_keywords=["helpful", "clean"])
+engine = RejectionSamplingEngine(model, tokenizer, evaluator)
+
+best_cand, all_cands = engine.sample_best_of_n("Explain gravity:", num_candidates=4)
+print(f"Top Response ({best_cand.reward_score:.2f}): {best_cand.text}")
+```
+
+#### F. High-Performance Go Tokenizer
+Concurrent Byte-Level Tokenizer implemented in pure Go:
+```go
+import "github.com/sujanv/nexlm/go_client/tokenizer"
+
+tok := tokenizer.NewTokenizer()
+tok.BuildFromText("training corpus")
+
+// Concurrent batch encoding with worker pools
+batch := []string{"hello world", "artificial intelligence"}
+tokens := tok.EncodeBatchConcurrently(batch, 4)
 ```
 
 ---
 
-### 4. Inference & Serving Recipes
+## ⚡ Inference & Serving
 
-#### A. Interactive Terminal Chat REPL (Milestone 23)
-Chat interactively with token-by-token colorized streaming:
-```bash
-PYTHONPATH=. python cli/chat.py --temperature 0.7
-```
-In-chat commands:
-- `/clear`: Reset conversation context
-- `/tokens`: Display current token count
-- `/temp 0.9`: Adjust temperature on the fly
-- `/exit`: Quit session
-
-#### B. Web Playground & Streaming REST Server (Milestone 15)
-Start the zero-dependency streaming server:
+### 1. OpenAI-Compatible SSE Streaming Server
 ```bash
 PYTHONPATH=. python server/server.py --port 8080
 ```
-- Open **`http://localhost:8080/`** in your browser for the dark-mode playground.
-- Connect programmatically via OpenAI-compatible API:
+Open `http://localhost:8080` in your browser for the interactive dark-mode Web Playground, or stream tokens via curl:
 ```bash
-curl http://localhost:8080/v1/chat/completions \
+curl -N http://localhost:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "Once upon a time, Lily found", "max_tokens": 50, "stream": true}'
+  -d '{"messages": [{"role": "user", "content": "Once upon a time"}], "stream": true}'
 ```
 
-#### C. High-Performance Go (Golang) Client & Benchmark (Milestone 30)
-Run high-concurrency streaming inference using the native Go client:
+### 2. High-Performance Go Streaming Client
 ```bash
 cd go_client
-
-# Single streaming prompt with Time-To-First-Token (TTFT) metrics
-go run main.go --prompt "Once upon a time" --tokens 60
-
-# Concurrency benchmark (20 requests across 4 workers)
-go run main.go --bench -c 4 -n 20
-```
-
-#### D. Speculative Decoding (Milestone 20)
-Generate tokens $2\times - 3\times$ faster using a lightweight draft model to speculate candidates:
-```python
-from inference.speculative import speculative_generate
-# out_tokens, accept_rate = speculative_generate(target_model, draft_model, prompt, gamma=4)
-```
-
-#### E. Post-Training INT8 / INT4 Quantization (Milestone 14)
-Halve memory consumption while retaining $>0.999$ output cosine similarity:
-```python
-from inference.quantize import quantize_model, compute_model_size_mb
-
-print(f"FP32 Size: {compute_model_size_mb(model):.2f} MB")
-q_model = quantize_model(model, bits=8)
-print(f"INT8 Size: {compute_model_size_mb(q_model):.2f} MB")
+go run main.go -prompt "Once upon a time" -stream
+# Run high-concurrency throughput benchmark:
+go run main.go -bench -concurrency 20 -requests 100
 ```
 
 ---
 
-### 5. Benchmarking
+## 📊 Benchmarks & Evaluations
 
-#### A. Key-Value (KV) Cache Benchmark
-Compare latency and speedup across generation lengths:
+#### A. KV-Cache Latency Acceleration
 ```bash
 PYTHONPATH=. python benchmarks/bench_kv_cache.py
 ```
@@ -258,7 +253,6 @@ PYTHONPATH=. python benchmarks/bench_kv_cache.py
 | 200 | 5.21s | 1.18s | **4.4x** |
 
 #### B. Needle In A Haystack (NIAH) Context Retrieval Test
-Test retrieval accuracy at multiple document depths (10%, 50%, 90%):
 ```bash
 PYTHONPATH=. python benchmarks/needle_in_haystack.py --context_len 128
 ```

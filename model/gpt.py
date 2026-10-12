@@ -25,6 +25,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from model.transformer import TransformerBlock, LayerNorm
+from model.rmsnorm import RMSNorm
 
 
 @dataclass
@@ -36,6 +37,7 @@ class GPTConfig:
     n_layers: int = 4
     dropout: float = 0.1
     tie_weights: bool = True
+    norm_type: str = "layernorm"
 
 
 class GPT(nn.Module):
@@ -59,12 +61,16 @@ class GPT(nn.Module):
                 n_heads=config.n_heads,
                 max_seq_len=config.max_seq_len,
                 dropout=config.dropout,
+                norm_type=config.norm_type,
             )
             for _ in range(config.n_layers)
         ])
 
         # Final normalization and LM projection head
-        self.ln_f = LayerNorm(config.d_model)
+        if config.norm_type.lower() == "rmsnorm":
+            self.ln_f = RMSNorm(config.d_model)
+        else:
+            self.ln_f = LayerNorm(config.d_model)
         self.lm_head = nn.Linear(config.d_model, config.vocab_size, bias=False)
 
         # Weight tying: reuse token embedding weights in lm_head

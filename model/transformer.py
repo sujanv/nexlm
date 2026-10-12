@@ -18,6 +18,7 @@ import torch
 import torch.nn as nn
 
 from model.attention import MultiHeadCausalSelfAttention
+from model.rmsnorm import RMSNorm
 
 
 class LayerNorm(nn.Module):
@@ -63,19 +64,32 @@ class MLP(nn.Module):
 
 class TransformerBlock(nn.Module):
     """
-    A single GPT-style Pre-LayerNorm Transformer Block.
+    A single GPT-style Pre-LayerNorm / Pre-RMSNorm Transformer Block.
     """
 
-    def __init__(self, d_model: int, n_heads: int, max_seq_len: int, dropout: float = 0.1):
+    def __init__(
+        self,
+        d_model: int,
+        n_heads: int,
+        max_seq_len: int,
+        dropout: float = 0.1,
+        norm_type: str = "layernorm",
+    ):
         super().__init__()
-        self.ln_1 = LayerNorm(d_model)
+        self.norm_type = norm_type.lower()
+        if self.norm_type == "rmsnorm":
+            self.ln_1 = RMSNorm(d_model)
+            self.ln_2 = RMSNorm(d_model)
+        else:
+            self.ln_1 = LayerNorm(d_model)
+            self.ln_2 = LayerNorm(d_model)
+
         self.attn = MultiHeadCausalSelfAttention(
             d_model=d_model,
             n_heads=n_heads,
             max_seq_len=max_seq_len,
             dropout=dropout,
         )
-        self.ln_2 = LayerNorm(d_model)
         self.mlp = MLP(d_model=d_model, dropout=dropout)
 
     def forward(

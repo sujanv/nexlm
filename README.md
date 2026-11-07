@@ -4,12 +4,12 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB.svg?style=flat&logo=python)](https://python.org)
 [![Go](https://img.shields.io/badge/Go-1.20+-00ADD8.svg?style=flat&logo=go)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/Tests-92%20Passing-brightgreen.svg)]()
-[![Commits](https://img.shields.io/badge/Milestones-45%20Commits-blue.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-110%20Passing-brightgreen.svg)]()
+[![Commits](https://img.shields.io/badge/Milestones-52%20Commits-blue.svg)]()
 
 **NexLM** is a comprehensive, production-grade, yet educational GPT-style Transformer language model implemented completely from scratch using PyTorch primitives.
 
-From fundamental tokenization and self-attention up to cutting-edge frontier techniques—including **Root Mean Square Normalization (RMSNorm)**, **Rotary Embeddings (RoPE)**, **YaRN Context Window Scaling**, **DeepSeek Multi-Head Latent Attention (MLA)**, **SwiGLU**, **Grouped-Query Attention (GQA)**, **Sliding Window Attention (SWA)**, **Multi-Token Prediction (MTP)**, **LoRA fine-tuning**, **Direct Preference Optimization (DPO)**, **Rejection Sampling / Best-of-N Alignment**, **SLERP & DARE Model Merging**, **Streaming Tool / Function Calling**, **Continuous Batching**, **Speculative Decoding**, **vLLM-style Paged Attention**, **Fine-Grained Block-Wise Quantization (.nexq)**, and **High-Throughput Go Serving, Tokenization & Architecture Inspection**—NexLM is designed to be the ultimate ML/AI engineering reference.
+From fundamental tokenization and self-attention up to cutting-edge frontier techniques—including **Root Mean Square Normalization (RMSNorm)**, **Rotary Embeddings (RoPE)**, **YaRN Context Window Scaling**, **DeepSeek Multi-Head Latent Attention (MLA)**, **SwiGLU**, **Grouped-Query Attention (GQA)**, **Sliding Window Attention (SWA)**, **Multi-Token Prediction (MTP)**, **Medusa Tree Attention Speculative Decoding**, **KTO (Kahneman-Tversky Optimization) Alignment**, **QLoRA NF4 Quantization**, **Chunked Prefill & Attention Sinks (StreamingLLM)**, **Min-P & Typical Sampling**, **LoRA fine-tuning**, **Direct Preference Optimization (DPO)**, **Rejection Sampling / Best-of-N Alignment**, **SLERP & DARE Model Merging**, **Streaming Tool / Function Calling**, **Continuous Batching**, **vLLM-style Paged Attention**, **Fine-Grained Block-Wise Quantization (.nexq)**, and **High-Throughput Go Gateway Router, Rate Limiter, Tokenization & Architecture Inspection**—NexLM is designed to be the ultimate ML/AI engineering reference.
 
 ---
 
@@ -39,12 +39,17 @@ NexLM/
 │   ├── evaluate.py            # Evaluation & prompt completion CLI
 │   ├── amp.py                 # Automatic Mixed Precision (AMP) training manager
 │   ├── dpo.py                 # Direct Preference Optimization (DPO) alignment engine
+│   ├── kto.py                 # Kahneman-Tversky Optimization (KTO) unpaired alignment engine
+│   ├── qlora.py               # QLoRA 4-bit NormalFloat4 (NF4) quantization & adapters
 │   ├── checkpointing.py       # Activation / Gradient Checkpointing memory optimizer
 │   ├── rejection_sampling.py  # Best-of-N Rejection Sampling & Reward Model alignment
 │   └── model_merging.py       # SLERP & DARE / Task Arithmetic post-training model merging
 ├── inference/
 │   ├── generate.py            # Autoregressive decoding (greedy, temp, top-k, top-p, KV cache)
 │   ├── sampler.py             # Temperature scaling, Top-K, and Top-P filtering
+│   ├── advanced_sampler.py    # Min-P, Locally Typical, and Frequency/Presence Penalties
+│   ├── tree_attention.py      # Medusa / Eagle Multi-Head Tree Attention Speculative Decoding
+│   ├── chunked_prefill.py     # Long-Context Chunked Prefill & Attention Sinks (StreamingLLM)
 │   ├── quantize.py            # Post-Training Quantization (INT8 & INT4 weight-only)
 │   ├── block_quantization.py  # Fine-grained Block-Wise Quantization (.nexq format)
 │   ├── continuous_batching.py # Iteration-level Continuous Batching serving engine
@@ -59,6 +64,7 @@ NexLM/
 ├── go_client/
 │   ├── go.mod                 # Golang module definition
 │   ├── main.go                # High-throughput Go streaming client & benchmark CLI
+│   ├── router/                # High-Throughput Go Request Router & Token Bucket Rate Limiter
 │   ├── tokenizer/             # Concurrent Go Byte-Level Tokenizer & Vocab Parser
 │   └── inspector/             # Go Model Diagnostics & Parameter/Memory Layout Inspector
 ├── cli/
@@ -72,14 +78,14 @@ NexLM/
 │   └── needle_in_haystack.py  # Needle In A Haystack (NIAH) context retrieval test
 ├── data/
 │   └── download_tinystories.py# TinyStories dataset downloader & generator
-├── tests/                     # Comprehensive test suite (92 unit tests passing)
+├── tests/                     # Comprehensive test suite (110 unit tests passing)
 ├── demo.py                    # One-command training & generation demo
 └── README.md
 ```
 
 ---
 
-## 🏗️ The 45 Milestones & Capabilities
+## 🏗️ The 52 Milestones & Capabilities
 
 | Phase | Milestone | File(s) | Description |
 |:---|:---|:---|:---|
@@ -107,6 +113,8 @@ NexLM/
 | | `29-checkpointing` | [`checkpointing.py`](file:///Users/sujan/Public/NexLM/training/checkpointing.py)| Gradient / Activation Checkpointing reducing peak activation VRAM |
 | | `36-rejection-sampling`| [`rejection_sampling.py`](file:///Users/sujan/Public/NexLM/training/rejection_sampling.py)| Best-of-N Rejection Sampling with reward heuristics & pair curation |
 | | `42-model-merging` | [`model_merging.py`](file:///Users/sujan/Public/NexLM/training/model_merging.py)| Spherical Linear Interpolation (SLERP) and DARE Task Arithmetic |
+| | `46-kto-alignment` | [`kto.py`](file:///Users/sujan/Public/NexLM/training/kto.py) | Kahneman-Tversky Optimization (KTO) unpaired binary feedback alignment |
+| | `49-qlora-nf4` | [`qlora.py`](file:///Users/sujan/Public/NexLM/training/qlora.py) | 4-bit NormalFloat4 (NF4) quantile quantizer and adapter layer |
 | **Inference Optimization**| `14-quantization` | [`quantize.py`](file:///Users/sujan/Public/NexLM/inference/quantize.py) | Post-Training INT8 and INT4 weight-only quantization |
 | | `20-speculative` | [`speculative.py`](file:///Users/sujan/Public/NexLM/inference/speculative.py) | Speculative Decoding achieving $2\times - 3\times$ speedup via draft model |
 | | `22-paged-cache` | [`paged_cache.py`](file:///Users/sujan/Public/NexLM/inference/paged_cache.py) | vLLM-style Paged Attention virtual memory block manager |
@@ -116,12 +124,16 @@ NexLM/
 | | `35-block-quant` | [`block_quantization.py`](file:///Users/sujan/Public/NexLM/inference/block_quantization.py)| Fine-grained 32-element Block-Wise Quantization (.nexq format) |
 | | `41-contrastive` | [`contrastive_decoding.py`](file:///Users/sujan/Public/NexLM/inference/contrastive_decoding.py)| Contrastive Decoding & Classifier-Free Guidance (CFG) for sharp reasoning |
 | | `43-tool-calling` | [`tool_calling.py`](file:///Users/sujan/Public/NexLM/inference/tool_calling.py)| Streaming Tool / Function Calling pushdown parser and dispatcher |
+| | `47-tree-attention` | [`tree_attention.py`](file:///Users/sujan/Public/NexLM/inference/tree_attention.py)| Medusa / Eagle Multi-Head Tree Attention Speculative Decoding |
+| | `48-advanced-sampler`| [`advanced_sampler.py`](file:///Users/sujan/Public/NexLM/inference/advanced_sampler.py)| Min-P, Locally Typical, and Frequency/Presence Penalty sampling |
+| | `50-chunked-prefill` | [`chunked_prefill.py`](file:///Users/sujan/Public/NexLM/inference/chunked_prefill.py)| Chunked Prefill & StreamingLLM Attention Sink eviction engine |
 | **Serving & Go Tooling**| `15-serving-api` | [`server.py`](file:///Users/sujan/Public/NexLM/server/server.py) | OpenAI-compatible SSE streaming API + Dark-Mode Web Playground |
 | | `23-terminal-chat` | [`chat.py`](file:///Users/sujan/Public/NexLM/cli/chat.py) | Multi-turn streaming CLI REPL with slash commands |
 | | `30-golang-client` | [`main.go`](file:///Users/sujan/Public/NexLM/go_client/main.go) | High-performance Go streaming client & concurrency benchmark |
 | | `37-golang-tokenizer`| [`tokenizer.go`](file:///Users/sujan/Public/NexLM/go_client/tokenizer/tokenizer.go)| Go Byte-Level Tokenizer with concurrent multi-worker batch encoding |
 | | `44-golang-inspector`| [`inspector.go`](file:///Users/sujan/Public/NexLM/go_client/inspector/inspector.go)| Go Model Architecture Diagnostics & memory footprint calculator |
-| | `45-complete-docs` | [`README.md`](file:///Users/sujan/Public/NexLM/README.md) | Complete end-to-end production documentation & benchmarking guide |
+| | `51-golang-router` | [`router.go`](file:///Users/sujan/Public/NexLM/go_client/router/router.go) | Go Request Router, Token Bucket Rate Limiter, and Load Balancer |
+| | `52-complete-v3-docs`| [`README.md`](file:///Users/sujan/Public/NexLM/README.md) | Complete end-to-end production documentation & benchmarking guide |
 
 ---
 
@@ -137,7 +149,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Run test suite to verify all 92 unit tests:
+Run test suite to verify all 110 unit tests:
 ```bash
 PYTHONPATH=. pytest -v
 ```
@@ -146,82 +158,97 @@ PYTHONPATH=. pytest -v
 
 ### 2. Frontier Architectural Recipes
 
-#### A. YaRN Context Window Extension
-Scales context length up to 16x without fine-tuning:
+#### A. Kahneman-Tversky Optimization (KTO) Alignment
+Aligns models directly from binary feedback (thumbs up / thumbs down) without preference pairs:
 ```python
-from model.yarn import YaRNScaledRotaryEmbedding, apply_yarn_rope
+from training.kto import KTOEngine, KTOBatch
 
-yarn = YaRNScaledRotaryEmbedding(
-    dim=32,
-    max_seq_len=2048,
-    original_max_seq_len=256,
-    scale=8.0,
+optimizer = torch.optim.AdamW(policy_model.parameters(), lr=1e-5)
+engine = KTOEngine(policy_model, ref_model, optimizer, beta=0.1)
+
+batch = KTOBatch(
+    prompt_ids=prompt_tokens,
+    completion_ids=completion_tokens,
+    labels=torch.tensor([1, 0, 1]),  # 1 = desirable, 0 = undesirable
 )
-cos, sin = yarn(seq_len=1024, device=q.device)
-q_rot, k_rot = apply_yarn_rope(q, k, cos, sin)
+metrics = engine.train_step(batch)
+print(f"KTO Loss: {metrics['kto_loss']:.4f}")
 ```
 
-#### B. DeepSeek Multi-Head Latent Attention (MLA)
-Reduces KV cache memory by over 85% by caching compressed low-rank latents:
+#### B. Medusa Tree Attention Speculative Decoding
+Verifies 2D speculative candidate trees in parallel using custom causal tree attention masks:
 ```python
-from model.mla import MultiHeadLatentAttention
+from inference.tree_attention import MedusaModel, verify_tree_candidates
 
-mla = MultiHeadLatentAttention(
-    d_model=256,
-    n_heads=8,
-    q_lora_rank=64,
-    kv_lora_rank=64,
-    qk_nope_head_dim=32,
-    qk_rope_head_dim=16,
-    v_head_dim=32,
+medusa = MedusaModel(base_model, num_heads=3, top_k_per_head=2)
+tree = medusa.generate_candidate_tree(last_hidden, last_token_id)
+tokens, mask = tree.flatten()
+
+# Single forward pass through target model verifies all candidate paths:
+target_logits = target_model(tokens, tree_mask=mask)
+accepted_tokens, num_accepted = verify_tree_candidates(tree, target_logits)
+```
+
+#### C. Min-P & Locally Typical Sampling
+Dynamically prunes low-probability tokens relative to distribution peak and conditional entropy:
+```python
+from inference.advanced_sampler import advanced_sample
+
+# Min-P: Prunes tokens with prob < 0.05 * max_prob
+next_token = advanced_sample(logits, min_p=0.05, temperature=0.8)
+
+# Locally Typical: Selects tokens closest to conditional entropy
+next_token = advanced_sample(logits, typical_p=0.85, temperature=0.8)
+
+# With Frequency & Presence Penalties:
+next_token = advanced_sample(
+    logits,
+    context_tokens=history_ids,
+    frequency_penalty=0.5,
+    presence_penalty=0.5,
 )
-# Forward pass returns output and (cached_c_kv, cached_k_rope)
-out, kv_cache = mla(x, use_cache=True)
 ```
 
-#### C. Contrastive Decoding & Classifier-Free Guidance (CFG)
-Dramatically sharpens reasoning and eliminates vacuous tokens:
+#### D. QLoRA 4-bit NormalFloat4 (NF4) Fine-Tuning
+Freezes base weights in information-theoretically optimal 4-bit NF4 representation while training low-rank adapters:
 ```python
-from inference.contrastive_decoding import generate_contrastive, generate_cfg
+from training.qlora import QLoRALinear
 
-# Contrastive Decoding (Expert vs Amateur model)
-tokens = generate_contrastive(expert_model, amateur_model, input_ids, alpha=0.5, beta=0.1)
-
-# Classifier-Free Guidance (CFG scale > 1.0)
-tokens_cfg = generate_cfg(model, prompt_ids, cfg_scale=1.5, max_new_tokens=40)
+# Convert standard linear to 4-bit NF4 QLoRA layer
+qlora_layer = QLoRALinear.from_linear(linear, r=8, lora_alpha=16.0, block_size=64)
+output = qlora_layer(x)
+loss = output.sum()
+loss.backward()  # Gradients only flow into lora_A and lora_B!
 ```
 
-#### D. Post-Training Model Merging (SLERP & DARE)
-Merge fine-tuned checkpoints without retraining or GPUs:
+#### E. Chunked Prefill & Attention Sinks (StreamingLLM)
+Eliminates OOM spikes and enables infinite continuous sequence generation:
 ```python
-from training.model_merging import merge_models_slerp, merge_models_dare
+from inference.chunked_prefill import chunked_prefill, AttentionSinkKVCache
 
-# Spherical Linear Interpolation (SLERP)
-merged_slerp = merge_models_slerp(math_model, code_model, t=0.5)
+# 1. Chunked Prefill: processes prompt in 128-token chunks
+logits, kv_cache = chunked_prefill(model, long_prompt_ids, chunk_size=128)
 
-# DARE Task Arithmetic Merging
-merged_dare = merge_models_dare(base_model, [task_model_1, task_model_2], drop_rate=0.2)
+# 2. Attention Sinks: retains 4 initial sink tokens + 256 rolling tokens
+sink_cache = AttentionSinkKVCache(num_sink_tokens=4, window_size=256)
+pruned_kv = sink_cache.evict_and_retain(kv_cache)
 ```
 
-#### E. Streaming Tool / Function Calling
-Real-time state machine parsing function calls on token streams:
-```python
-from inference.tool_calling import StreamingToolParser, ToolRegistry, ToolDefinition
+#### F. Go Request Router & Rate Limiter
+Production Go load balancer with token bucket rate limiting:
+```go
+import "github.com/sujanv/nexlm/go_client/router"
 
-parser = StreamingToolParser()
-for token_delta in stream:
-    user_text, completed_calls = parser.feed(token_delta)
-    if user_text:
-        print(user_text, end="", flush=True)
-    for call in completed_calls:
-        print(f"\n[Executing Tool: {call.name} with {call.arguments}]")
-```
+b1 := &router.Backend{URL: "http://localhost:8080", Healthy: true}
+b2 := &router.Backend{URL: "http://localhost:8081", Healthy: true}
 
-#### F. Go Model Architecture Inspector
-Analyze parameter counts, tensor layouts, and memory footprints in Go:
-```bash
-cd go_client/inspector
-go test -v ./...
+// 100 QPS with burst capacity of 20, using least-connection balancing
+r := router.NewRouter([]*router.Backend{b1, b2}, 100.0, 20.0, "least_conn")
+
+resp, err := r.ExecuteRequest(func(b *router.Backend) (string, error) {
+    // Send request to b.URL
+    return "response", nil
+})
 ```
 
 ---
@@ -239,9 +266,10 @@ curl -N http://localhost:8080/v1/chat/completions \
   -d '{"messages": [{"role": "user", "content": "Once upon a time"}], "stream": true}'
 ```
 
-### 2. High-Performance Go Streaming Client & Inspector
+### 2. High-Performance Go Streaming Client & Router
 ```bash
 cd go_client
+go test -v ./...
 go run main.go -prompt "Once upon a time" -stream
 # High-concurrency benchmark:
 go run main.go -bench -concurrency 20 -requests 100
